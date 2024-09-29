@@ -1,33 +1,50 @@
 import React from "react";
-import { DataGrid } from "@mui/x-data-grid";
-import { useQuery } from "@tanstack/react-query";
-import { fetchEmployees } from "../api";
+import { AgGridReact } from "ag-grid-react";
+import { Button } from "@mui/material";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 
-const EmployeeTable = () => {
-  const { data: employees, isLoading } = useQuery("employees", fetchEmployees);
-
-  const columns = [
-    { field: "id", headerName: "ID", width: 90 },
-    { field: "name", headerName: "Name", width: 150 },
-    { field: "email_address", headerName: "Email Address", width: 200 },
-    { field: "phone_number", headerName: "Phone Number", width: 150 },
-    { field: "days_worked", headerName: "Days Worked", width: 150 },
-    { field: "cafe", headerName: "Café", width: 130 },
+const EmployeeTable = ({ employees, onDelete }) => {
+  const columnDefs = [
+    { headerName: "Employee ID", field: "id", sortable: true },
+    { headerName: "Name", field: "name", sortable: true },
+    { headerName: "Email Address", field: "email_address", sortable: true },
+    { headerName: "Phone Number", field: "phone_number", sortable: true },
+    { headerName: "Days Worked", field: "days_worked", sortable: true },
+    { headerName: "Café Name", field: "cafe", sortable: true },
     {
-      field: "actions",
       headerName: "Actions",
-      renderCell: (params) => <div>{/* Add Edit and Delete buttons */}</div>,
-      width: 150,
+      field: "id",
+      cellRendererFramework: (params) => (
+        <div>
+          <Button
+            variant="outlined"
+            onClick={() =>
+              (window.location.href = `/edit-employee/${params.value}`)
+            }
+          >
+            Edit
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => onDelete(params.value)}
+            style={{ marginLeft: "10px" }}
+          >
+            Delete
+          </Button>
+        </div>
+      ),
     },
   ];
 
   return (
-    <div style={{ height: 400, width: "100%" }}>
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <DataGrid rows={employees} columns={columns} pageSize={5} />
-      )}
+    <div className="ag-theme-alpine" style={{ height: "400px", width: "100%" }}>
+      <AgGridReact
+        rowData={employees}
+        columnDefs={columnDefs}
+        pagination={true}
+      />
     </div>
   );
 };
