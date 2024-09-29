@@ -1,11 +1,15 @@
-//import React, { useState } from "react";
+import React from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Container, Button, Typography } from "@mui/material";
 import EmployeeTable from "../components/EmployeeTable";
 import { fetchEmployees, deleteEmployee } from "../utils/api";
 
 const EmployeesPage = () => {
-  const { data: employees, refetch } = useQuery("employees", fetchEmployees);
+  // Update useQuery to use the object syntax
+  const { data: employees, refetch } = useQuery({
+    queryKey: ["employees"],
+    queryFn: fetchEmployees,
+  });
 
   const mutation = useMutation({
     mutationFn: (id) => deleteEmployee(id),
@@ -28,7 +32,7 @@ const EmployeesPage = () => {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => (window.location.href = "/edit-employee")}
+        onClick={() => (window.location.href = "/employees/edit")}
       >
         Add New Employee
       </Button>

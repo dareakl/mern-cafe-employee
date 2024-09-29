@@ -9,8 +9,13 @@ const CafeTable = ({ cafes, onDelete }) => {
     {
       headerName: "Logo",
       field: "logo",
-      cellRenderer: (params) =>
-        `<img src="${params.value}" alt="Logo" style="width: 50px; height: auto;" />`,
+      cellRenderer: (params) => (
+        <img
+          src={params.value}
+          alt="Logo"
+          style={{ width: "50px", height: "auto" }}
+        />
+      ),
       sortable: true,
     },
     { headerName: "Name", field: "name", sortable: true },
@@ -19,13 +24,12 @@ const CafeTable = ({ cafes, onDelete }) => {
     { headerName: "Location", field: "location", sortable: true },
     {
       headerName: "Actions",
-      field: "id",
       cellRendererFramework: (params) => (
         <div>
           <Button
             variant="outlined"
             onClick={() =>
-              (window.location.href = `/edit-cafe/${params.value}`)
+              (window.location.href = `/cafes/edit/${params.data.id}`)
             }
           >
             Edit
@@ -33,7 +37,7 @@ const CafeTable = ({ cafes, onDelete }) => {
           <Button
             variant="outlined"
             color="error"
-            onClick={() => onDelete(params.value)}
+            onClick={() => handleDelete(params.data.id)}
             style={{ marginLeft: "10px" }}
           >
             Delete
@@ -42,6 +46,15 @@ const CafeTable = ({ cafes, onDelete }) => {
       ),
     },
   ];
+
+  const handleDelete = (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this café?"
+    );
+    if (confirmed) {
+      onDelete(id); // Call the onDelete function passed as a prop
+    }
+  };
 
   return (
     <div className="ag-theme-alpine" style={{ height: "400px", width: "100%" }}>
