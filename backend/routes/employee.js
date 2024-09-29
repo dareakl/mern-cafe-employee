@@ -5,6 +5,47 @@ const Cafe = require("../models/Cafe");
 const router = express.Router();
 
 // GET /employees?cafe=<café>
+// router.get("/", async (req, res) => {
+//   const { cafe } = req.query;
+
+//   try {
+//     let employees;
+
+//     if (cafe) {
+//       // Find employees belonging to the specified cafe
+//       const cafeDoc = await Cafe.findOne({ name: cafe });
+//       if (!cafeDoc) return res.status(404).json({ error: "Café not found" });
+//       employees = await Employee.find({ cafeId: cafeDoc._id });
+//     } else {
+//       // If no café is provided, fetch all employees
+//       employees = await Employee.find();
+//     }
+
+//     // Calculate days worked and prepare the response
+//     const currentDate = new Date();
+//     const employeesWithDaysWorked = employees.map((employee) => {
+//       const daysWorked = Math.floor(
+//         (currentDate - new Date(employee.start_date)) / (1000 * 60 * 60 * 24)
+//       );
+//       return {
+//         id: employee.id,
+//         name: employee.name,
+//         email_address: employee.email_address,
+//         phone_number: employee.phone_number,
+//         days_worked: daysWorked,
+//         cafe: employee.cafeId ? cafe : "", // Fetch café name if assigned
+//       };
+//     });
+
+//     // Sort by days worked in descending order
+//     employeesWithDaysWorked.sort((a, b) => b.days_worked - a.days_worked);
+
+//     res.json(employeesWithDaysWorked);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
 router.get("/", async (req, res) => {
   const { cafe } = req.query;
 
@@ -15,11 +56,20 @@ router.get("/", async (req, res) => {
       // Find employees belonging to the specified cafe
       const cafeDoc = await Cafe.findOne({ name: cafe });
       if (!cafeDoc) return res.status(404).json({ error: "Café not found" });
-      employees = await Employee.find({ cafeId: cafeDoc._id });
+      employees = await Employee.find({ cafeId: cafeDoc.id });
     } else {
       // If no café is provided, fetch all employees
       employees = await Employee.find();
     }
+
+    // Fetch all cafes to map cafeId to cafe name later
+    const cafes = await Cafe.find().lean();
+    const cafeMap = cafes.reduce((acc, cafe) => {
+      acc[cafe.id] = cafe.name;
+      return acc;
+    }, {});
+
+    //console.log("Cafe Map:", cafeMap); // Log cafeMap for debugging
 
     // Calculate days worked and prepare the response
     const currentDate = new Date();
@@ -27,13 +77,17 @@ router.get("/", async (req, res) => {
       const daysWorked = Math.floor(
         (currentDate - new Date(employee.start_date)) / (1000 * 60 * 60 * 24)
       );
+
+      // Log each employee's cafeId for debugging
+      // console.log("Employee Cafe ID:", employee.cafeId);
+
       return {
         id: employee.id,
         name: employee.name,
         email_address: employee.email_address,
         phone_number: employee.phone_number,
         days_worked: daysWorked,
-        cafe: employee.cafeId ? cafe : "", // Fetch café name if assigned
+        cafe: employee.cafeId ? cafeMap[employee.cafeId] || "" : "", // Fetch café name if assigned
       };
     });
 
