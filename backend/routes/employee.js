@@ -82,6 +82,7 @@ router.get("/", async (req, res) => {
       // console.log("Employee Cafe ID:", employee.cafeId);
 
       return {
+        _id: employee._id,
         id: employee.id,
         name: employee.name,
         email_address: employee.email_address,
@@ -95,6 +96,45 @@ router.get("/", async (req, res) => {
     employeesWithDaysWorked.sort((a, b) => b.days_worked - a.days_worked);
 
     res.json(employeesWithDaysWorked);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Route to get employee details by ID
+router.get("/:id", async (req, res) => {
+  const { id } = req.params; // Get the ID from the URL parameters
+
+  try {
+    // Fetch the specific employee by ID
+    const employee = await Employee.findById(id).lean();
+    if (!employee) return res.status(404).json({ error: "Employee not found" });
+
+    // Fetch all cafes to map cafeId to cafe name
+    const cafes = await Cafe.find().lean();
+    const cafeMap = cafes.reduce((acc, cafe) => {
+      acc[cafe._id] = cafe.name; // Use _id for matching
+      return acc;
+    }, {});
+
+    // Calculate days worked
+    const currentDate = new Date();
+    const daysWorked = Math.floor(
+      (currentDate - new Date(employee.start_date)) / (1000 * 60 * 60 * 24)
+    );
+
+    // Return the employee details with the café name
+    res.json({
+      _id: employee._id,
+      id: employee.id,
+      name: employee.name,
+      email_address: employee.email_address,
+      phone_number: employee.phone_number,
+      days_worked: daysWorked,
+      gender: employee.gender,
+      start_date: employee.start_date,
+      cafe: employee.cafeId ? cafeMap[employee.cafeId] || "" : "", // Fetch café name if assigned
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

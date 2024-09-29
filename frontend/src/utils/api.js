@@ -13,6 +13,7 @@ export const deleteCafe = async (id) => {
 
 export const fetchEmployees = async () => {
   const response = await axios.get(`${API_URL}/employee`);
+  //console.log(response.data); // Log the response data
   return response.data;
 };
 
