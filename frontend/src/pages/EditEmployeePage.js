@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "@tanstack/router";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   TextField,
@@ -26,13 +26,11 @@ const EditEmployeePage = () => {
     cafeId: "",
   });
 
-  const { data: employee } = useQuery(
-    ["employee", id],
-    () => fetchEmployee(id),
-    {
-      enabled: !!id,
-    }
-  );
+  const { data: employee } = useQuery({
+    queryKey: ["employee", id],
+    queryFn: () => fetchEmployee(id),
+    enabled: !!id,
+  });
 
   useEffect(() => {
     if (employee) {
@@ -92,8 +90,6 @@ const EditEmployeePage = () => {
         select
         SelectProps={{ native: true }}
       >
-        {/* You would typically fetch available cafés here */}
-        {/* Placeholder for cafés */}
         <option value="">Select Café</option>
         {/* Add other café options */}
       </TextField>
