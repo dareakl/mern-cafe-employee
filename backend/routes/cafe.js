@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
     const cafesWithEmployeeCount = await Promise.all(
       cafes.map(async (cafe) => {
         const employeeCount = await Employee.countDocuments({
-          cafeId: cafe._id,
+          cafeId: cafe.id,
         });
         return {
           _id: cafe._id,
