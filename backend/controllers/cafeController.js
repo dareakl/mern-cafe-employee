@@ -1,10 +1,13 @@
+// Import the CafeService to interact with cafe data
 const CafeService = require("../services/cafeService");
 
 class CafeController {
+  // Fetch all cafes based on location query parameter
   static async getCafes(req, res) {
     const { location } = req.query;
 
     try {
+      // Call the service to get cafes based on the specified location
       const cafes = await CafeService.getCafes(location);
       res.json(cafes);
     } catch (error) {
@@ -12,17 +15,20 @@ class CafeController {
     }
   }
 
+  // Fetch a single cafe by its ID
   static async getCafeById(req, res) {
     const { id } = req.params;
 
     try {
+      // Call the service to get a cafe by its ID
       const cafe = await CafeService.getCafeById(id);
       res.json(cafe);
     } catch (error) {
+      // Handle errors, responding with a 404 status if the cafe is not found
       res.status(404).json({ error: error.message });
     }
   }
-
+  // Create a new cafe
   static async createCafe(req, res) {
     try {
       const cafe = await CafeService.createCafe(req.body);
@@ -32,6 +38,7 @@ class CafeController {
     }
   }
 
+  // Update an existing cafe by its ID
   static async updateCafe(req, res) {
     const { id } = req.params;
 
@@ -42,7 +49,7 @@ class CafeController {
       res.status(400).json({ error: error.message });
     }
   }
-
+  // Delete a cafe by its ID
   static async deleteCafe(req, res) {
     const { id } = req.params;
 

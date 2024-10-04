@@ -1,6 +1,7 @@
 const EmployeeService = require("../services/employeeService");
 
 class EmployeeController {
+  // Fetch all employees, optionally filtered by cafe
   static async getEmployees(req, res) {
     const { cafe } = req.query;
 
@@ -11,7 +12,7 @@ class EmployeeController {
       res.status(500).json({ error: error.message });
     }
   }
-
+  // Fetch a single employee by their ID
   static async getEmployeeById(req, res) {
     const { id } = req.params;
 
@@ -22,7 +23,7 @@ class EmployeeController {
       res.status(404).json({ error: error.message });
     }
   }
-
+  // Create a new employee
   static async createEmployee(req, res) {
     try {
       const employeeData = { ...req.body };
@@ -36,7 +37,7 @@ class EmployeeController {
       res.status(400).json({ error: error.message });
     }
   }
-
+  // Update an existing employee by their ID
   static async updateEmployee(req, res) {
     const { id } = req.params;
 
@@ -47,7 +48,7 @@ class EmployeeController {
       res.status(400).json({ error: error.message });
     }
   }
-
+  // Delete an employee by their ID
   static async deleteEmployee(req, res) {
     const { id } = req.params;
 
@@ -59,7 +60,7 @@ class EmployeeController {
     }
   }
 }
-
+// Helper function to generate a unique ID for employees
 const generateUniqueId = () => {
   const prefix = "UI";
   const randomChars = [...Array(7)]
