@@ -102,7 +102,7 @@ const EditEmployeePage = () => {
 
   const validateForm = () => {
     const errors = [];
-    const { name, email_address, phone_number, cafeId, start_date } = formData;
+    const { name, email_address, phone_number } = formData;
 
     if (name.length < 6 || name.length > 10) {
       errors.push("Name must be between 6 and 10 characters.");
@@ -118,13 +118,13 @@ const EditEmployeePage = () => {
       errors.push("Phone number must start with 8 or 9 and be 8 digits long.");
     }
 
-    if (!cafeId) {
-      errors.push("Please select an assigned café.");
-    }
+    // if (!cafeId) {
+    //   errors.push("Please select an assigned café.");
+    // }
 
-    if (!start_date) {
-      errors.push("Please select a start date.");
-    }
+    // if (!start_date) {
+    //   errors.push("Please select a start date.");
+    // }
 
     if (errors.length > 0) {
       setErrorMessages(errors);

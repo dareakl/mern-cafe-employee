@@ -17,8 +17,8 @@ const employeeSchema = new mongoose.Schema({
     },
   },
   gender: { type: String, required: true, enum: ["Male", "Female"] },
-  cafeId: { type: String, required: true }, // Change this to String
-  start_date: { type: Date, required: true },
+  cafeId: { type: String, required: false }, // Change this to String
+  start_date: { type: Date, required: false },
 });
 
 module.exports = mongoose.model("Employee", employeeSchema);

@@ -50,6 +50,11 @@ const EmployeeTable = ({ employees, onDelete }) => {
         rowData={employees}
         columnDefs={columnDefs}
         pagination={true}
+        defaultColDef={{
+          sortable: true,
+          filter: true,
+          resizable: true,
+        }}
       />
     </div>
   );

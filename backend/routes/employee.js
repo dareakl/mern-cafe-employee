@@ -32,10 +32,13 @@ router.get("/", async (req, res) => {
     // Calculate days worked and prepare the response
     const currentDate = new Date();
     const employeesWithDaysWorked = employees.map((employee) => {
-      const daysWorked = Math.floor(
-        (currentDate - new Date(employee.start_date)) / (1000 * 60 * 60 * 24)
-      );
+      let daysWorked = null;
 
+      if (employee.start_date) {
+        daysWorked = Math.floor(
+          (currentDate - new Date(employee.start_date)) / (1000 * 60 * 60 * 24)
+        );
+      }
       // Log each employee's cafeId for debugging
       // console.log("Employee Cafe ID:", employee.cafeId);
 
@@ -77,9 +80,12 @@ router.get("/:id", async (req, res) => {
 
     // Calculate days worked
     const currentDate = new Date();
-    const daysWorked = Math.floor(
-      (currentDate - new Date(employee.start_date)) / (1000 * 60 * 60 * 24)
-    );
+    let daysWorked = null;
+    if (employee.start_date) {
+      daysWorked = Math.floor(
+        (currentDate - new Date(employee.start_date)) / (1000 * 60 * 60 * 24)
+      );
+    }
 
     // Return the employee details with the café name
     res.json({
@@ -98,6 +104,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// Create a new employee
 router.post("/", async (req, res) => {
   try {
     const employee = new Employee(req.body);
@@ -108,6 +115,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Update employee by ID
 router.put("/:id", async (req, res) => {
   try {
     const employee = await Employee.findByIdAndUpdate(req.params.id, req.body, {
@@ -120,6 +128,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// Delete employee by ID
 router.delete("/:id", async (req, res) => {
   try {
     const employee = await Employee.findByIdAndDelete(req.params.id);
