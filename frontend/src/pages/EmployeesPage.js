@@ -6,6 +6,7 @@ import {
   Typography,
   CircularProgress,
   Alert,
+  Box,
 } from "@mui/material";
 import EmployeeTable from "../components/EmployeeTable";
 import { fetchEmployees, deleteEmployee } from "../utils/api";
@@ -70,14 +71,33 @@ const EmployeesPage = () => {
       <Typography variant="h4" component="h1" gutterBottom>
         Employees
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => navigate("/employees/edit")}
-      >
-        Add New Employee
-      </Button>
-      <EmployeeTable employees={employees} onDelete={handleDelete} />
+      <Box display="flex" justifyContent="space-between" mb={2}>
+        {" "}
+        {/* Flexbox for alignment */}
+        <Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate("/employees/edit")}
+          >
+            Add New Employee
+          </Button>
+        </Box>
+        <Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => (window.location.href = "/cafes/edit")}
+          >
+            Add New Café
+          </Button>
+        </Box>
+      </Box>
+      <Box mt={2}>
+        {" "}
+        {/* Add margin top for the table */}
+        <EmployeeTable employees={employees} onDelete={handleDelete} />
+      </Box>
       {mutation.isLoading && <CircularProgress />}{" "}
       {/* Show loading spinner when deleting */}
       {mutation.isError && (

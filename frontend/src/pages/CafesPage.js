@@ -6,6 +6,7 @@ import {
   Typography,
   CircularProgress,
   Alert,
+  Box,
 } from "@mui/material";
 import CafeTable from "../components/CafeTable";
 import { fetchCafes, deleteCafe } from "../utils/api";
@@ -48,20 +49,37 @@ const CafesPage = () => {
       <Typography variant="h4" component="h1" gutterBottom>
         Cafés
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => (window.location.href = "/cafes/edit")}
-      >
-        Add New Café
-      </Button>
-      <CafeTable cafes={cafes} onDelete={handleDelete} />
+      <Box display="flex" justifyContent="space-between" mb={2}>
+        {" "}
+        {/* Flexbox for alignment */}
+        <Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => (window.location.href = "/cafes/edit")}
+          >
+            Add New Café
+          </Button>
+        </Box>
+        <Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => (window.location.href = "/employees/edit")}
+          >
+            Add New Employee
+          </Button>
+        </Box>
+      </Box>
+      <Box mt={2}>
+        {" "}
+        {/* Add margin top for the table */}
+        <CafeTable cafes={cafes} onDelete={handleDelete} />
+      </Box>
 
       {successMessage && (
         <Alert severity="success">
-          {
-            successMessage // Conditionally render success message
-          }
+          {successMessage} {/* Conditionally render success message */}
         </Alert>
       )}
     </Container>
