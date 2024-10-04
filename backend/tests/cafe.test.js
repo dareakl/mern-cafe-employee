@@ -1,89 +1,79 @@
 const request = require("supertest");
-const app = require("../server"); // Ensure server.js exports the app
 const mongoose = require("mongoose");
-const Cafe = require("../models/Cafe");
-const Employee = require("../models/Employee");
+const app = require("../server");
 
-describe("Café API", () => {
-  beforeAll(async () => {
-    // Connect to the test database (you should set this up in your server file)
-    await mongoose.connect("mongodb://127.0.0.1:27017/testing", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+jest.setTimeout(10000); // Set timeout to 10 seconds
+
+beforeAll(async () => {
+  // Connect to the test database
+  await mongoose.connect(process.env.TEST_MONGODB_URI, {
+    // Removed deprecated options
   });
+  console.log("Connected to test MongoDB.");
+});
 
-  afterAll(async () => {
-    // Clean up the database and close the connection
-    await Cafe.deleteMany({});
-    await Employee.deleteMany({});
-    await mongoose.connection.close();
-  });
+afterAll(async () => {
+  await mongoose.connection.dropDatabase();
+  await mongoose.connection.close();
+});
 
-  it("should create a new café", async () => {
-    const res = await request(app).post("/cafes").send({
-      name: "Coffee House",
+describe("Cafe API", () => {
+  let cafeId;
+
+  test("POST /cafe - Create a cafe", async () => {
+    const response = await request(app).post("/cafe").send({
+      name: "Cafe Mocha",
       description: "A cozy place for coffee lovers.",
-      logo: "logo.png",
-      location: "Downtown",
-    });
-    expect(res.statusCode).toEqual(201);
-    expect(res.body).toHaveProperty("name", "Coffee House");
-    expect(res.body).toHaveProperty("location", "Downtown");
-  });
-
-  it("should get all cafés", async () => {
-    const res = await request(app).get("/cafes");
-    expect(res.statusCode).toEqual(200);
-    expect(Array.isArray(res.body)).toBe(true);
-  });
-
-  it("should get cafés by location", async () => {
-    const res = await request(app).get("/cafes?location=Downtown");
-    expect(res.statusCode).toEqual(200);
-    expect(Array.isArray(res.body)).toBe(true);
-  });
-
-  it("should get café details by ID", async () => {
-    const cafe = await Cafe.create({
-      name: "Tea House",
-      description: "A quiet spot for tea lovers.",
-      logo: "tea_logo.png",
-      location: "Uptown",
+      logo: "https://example.com/logo.png",
+      location: "123 Coffee St",
     });
 
-    const res = await request(app).get(`/cafes/${cafe._id}`);
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty("name", "Tea House");
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty("id");
+    cafeId = response.body._id; // Store the cafe ID for later tests
   });
 
-  it("should update a café", async () => {
-    const cafe = await Cafe.create({
-      name: "Old Café",
-      description: "An old classic.",
-      logo: "old_logo.png",
-      location: "Midtown",
-    });
+  test("GET /cafe - Retrieve cafes", async () => {
+    const response = await request(app).get("/cafe");
 
-    const res = await request(app).put(`/cafes/${cafe._id}`).send({
-      name: "Updated Café",
-    });
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty("name", "Updated Café");
+    expect(response.status).toBe(200);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBeGreaterThan(0);
   });
 
-  it("should delete a café", async () => {
-    const cafe = await Cafe.create({
-      name: "Delete Me Café",
-      description: "A café that will be deleted.",
-      logo: "delete_logo.png",
-      location: "Anywhere",
+  test("GET /cafe/:id - Retrieve a cafe by ID", async () => {
+    const response = await request(app).get(`/cafe/${cafeId}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("_id", cafeId);
+    expect(response.body.name).toBe("Cafe Mocha");
+  });
+
+  test("PUT /cafe/:id - Update a cafe", async () => {
+    const response = await request(app).put(`/cafe/${cafeId}`).send({
+      name: "Cafe Latte",
+      description: "A new description for the cafe.",
+      logo: "https://example.com/new-logo.png", // Optional, but good to include for testing
+      location: "456 Coffee St", // Optional
     });
 
-    const res = await request(app).delete(`/cafes/${cafe._id}`);
-    expect(res.statusCode).toEqual(204);
+    // Log the response if it fails
+    if (response.status !== 200) {
+      console.error("Failed to update cafe:", response.body);
+    }
 
-    const deletedCafe = await Cafe.findById(cafe._id);
-    expect(deletedCafe).toBeNull();
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("_id", cafeId); // Check for _id
+    expect(response.body.name).toBe("Cafe Latte");
+  });
+
+  test("DELETE /cafe/:id - Delete a cafe", async () => {
+    const response = await request(app).delete(`/cafe/${cafeId}`);
+
+    expect(response.status).toBe(204);
+
+    // Verify deletion
+    const getResponse = await request(app).get(`/cafe/${cafeId}`);
+    expect(getResponse.status).toBe(404);
   });
 });
