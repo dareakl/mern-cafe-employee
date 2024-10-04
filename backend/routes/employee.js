@@ -4,6 +4,14 @@ const Cafe = require("../models/Cafe");
 
 const router = express.Router();
 
+const generateUniqueId = () => {
+  const prefix = "UI";
+  const randomChars = [...Array(7)]
+    .map(() => Math.random().toString(36)[2])
+    .join("");
+  return prefix + randomChars.toUpperCase(); // Convert to uppercase for consistency
+};
+
 router.get("/", async (req, res) => {
   const { cafe } = req.query;
 
@@ -104,10 +112,28 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// // Create a new employee
+// router.post("/", async (req, res) => {
+//   try {
+//     const employee = new Employee(req.body);
+//     await employee.save();
+//     res.status(201).json(employee);
+//   } catch (error) {
+//     res.status(400).json({ error: error.message });
+//   }
+// });
+
 // Create a new employee
 router.post("/", async (req, res) => {
   try {
-    const employee = new Employee(req.body);
+    const employeeData = { ...req.body };
+
+    // Check if the ID is provided; if not, generate one
+    if (!employeeData.id) {
+      employeeData.id = generateUniqueId();
+    }
+
+    const employee = new Employee(employeeData);
     await employee.save();
     res.status(201).json(employee);
   } catch (error) {
