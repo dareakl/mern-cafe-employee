@@ -65,6 +65,5 @@ describe("EditCafePage", () => {
     );
 
     fireEvent.click(screen.getByText(/Cancel/i));
-    // Verify navigation logic here based on your router setup
   });
 });

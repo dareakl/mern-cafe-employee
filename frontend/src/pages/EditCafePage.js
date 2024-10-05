@@ -11,14 +11,14 @@ import {
   Alert,
 } from "@mui/material";
 import axios from "axios";
-
+// Base URL for the API, falling back to localhost if not set
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4001";
-
+// Function to fetch café data by ID
 const fetchCafe = async (id) => {
   const { data } = await axios.get(`${API_URL}/cafe/${id}`);
   return data;
 };
-
+// Render a text field with error handling
 const renderTextField = ({
   input,
   label,
@@ -33,7 +33,7 @@ const renderTextField = ({
     {...custom}
   />
 );
-
+// Validation function for the form fields
 const validate = (values) => {
   const errors = {};
 
@@ -58,7 +58,7 @@ const validate = (values) => {
 
   return errors;
 };
-
+// EditCafePage component for editing or adding a café
 const EditCafePage = ({ handleSubmit, initialize }) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -91,7 +91,7 @@ const EditCafePage = ({ handleSubmit, initialize }) => {
       console.error("Error saving cafe:", error);
     },
   });
-
+  // Form submission handler
   const onSubmit = (formData) => {
     console.log("Submitting data:", formData);
     mutation.mutate(formData);

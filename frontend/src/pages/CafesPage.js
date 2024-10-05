@@ -19,7 +19,7 @@ const CafesPage = () => {
     queryKey: ["cafes", locationFilter],
     queryFn: () => fetchCafes(locationFilter),
   });
-
+  // Mutation for deleting a café
   const mutation = useMutation({
     mutationFn: (id) => deleteCafe(id),
     onSuccess: () => {
@@ -31,7 +31,7 @@ const CafesPage = () => {
       }, 3000);
     },
   });
-
+  // Handle deletion of a café
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this café?")) {
       mutation.mutate(id);
@@ -39,6 +39,7 @@ const CafesPage = () => {
   };
 
   if (isLoading) return <CircularProgress />;
+  // Error handling
   if (isError)
     return (
       <Alert severity="error">Error fetching cafés: {error.message}</Alert>

@@ -5,6 +5,7 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { useNavigate } from "react-router-dom";
 
+// CafeTable component renders a table displaying cafe information
 const CafeTable = ({ cafes, onDelete }) => {
   const navigate = useNavigate();
 
@@ -58,7 +59,7 @@ const CafeTable = ({ cafes, onDelete }) => {
       ),
     },
   ];
-
+  // Function to handle cafe deletion
   const handleDelete = (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this café?"

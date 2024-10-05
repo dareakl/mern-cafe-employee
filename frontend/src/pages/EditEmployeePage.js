@@ -17,19 +17,19 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import axios from "axios";
-
+// API base URL
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4001";
-
+// Function to fetch employee data by ID
 const fetchEmployee = async (id) => {
   const { data } = await axios.get(`${API_URL}/employee/${id}`);
   return data;
 };
-
+// Function to fetch all cafes for the select input
 const fetchCafes = async () => {
   const { data } = await axios.get(`${API_URL}/cafe`);
   return data;
 };
-
+// Render a text field with error handling
 const renderTextField = ({
   input,
   label,
@@ -44,7 +44,7 @@ const renderTextField = ({
     {...custom}
   />
 );
-
+// Render a radio group for gender selection
 const renderRadioGroup = ({ input, meta: { touched, error } }) => (
   <div>
     <RadioGroup {...input}>
@@ -58,16 +58,19 @@ const renderRadioGroup = ({ input, meta: { touched, error } }) => (
     )}
   </div>
 );
-
+// Validation function for the form fields
 const validate = (values) => {
   const errors = {};
+  // Name validation
   if (!values.name || values.name.length < 6 || values.name.length > 10) {
     errors.name = "Name must be between 6 and 10 characters.";
   }
+  // Email validation
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailPattern.test(values.email_address)) {
     errors.email_address = "Please enter a valid email address.";
   }
+  // Phone number validation
   const phonePattern = /^[89]\d{7}$/;
   if (!phonePattern.test(values.phone_number)) {
     errors.phone_number =
@@ -79,12 +82,13 @@ const validate = (values) => {
   // if (!values.start_date) {
   //   errors.start_date = "Please select a start date.";
   // }
+  // Gender validation
   if (!values.gender) {
     errors.gender = "Please select your gender.";
   }
   return errors;
 };
-
+// EditEmployeePage component for editing or adding an employee
 const EditEmployeePage = ({
   handleSubmit,
   initialize,
@@ -93,18 +97,18 @@ const EditEmployeePage = ({
 }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  // Query to fetch employee data
   const { data: employee, error, isLoading } = useQuery({
     queryKey: ["employee", id],
     queryFn: () => fetchEmployee(id),
     enabled: !!id,
   });
-
+  // Query to fetch cafés for the café select input
   const { data: cafes } = useQuery({
     queryKey: ["cafes"],
     queryFn: fetchCafes,
   });
-
+  // Initialize form with fetched employee data for editing
   useEffect(() => {
     if (employee) {
       initialize({
@@ -117,7 +121,7 @@ const EditEmployeePage = ({
       });
     }
   }, [employee, initialize]);
-
+  // Mutation for saving employee data
   const mutation = useMutation({
     mutationFn: async (formData) => {
       if (id) {
@@ -135,13 +139,14 @@ const EditEmployeePage = ({
       alert("Failed to save employee data. Please try again.");
     },
   });
-
+  // Form submission handler
   const onSubmit = (formData) => {
     console.log("Submitting Employee data:", formData);
     mutation.mutate(formData);
   };
-
+  // Loading state
   if (isLoading) return <div>Loading...</div>;
+  // Error handling
   if (error) return <div>Error fetching employee data.</div>;
 
   return (
