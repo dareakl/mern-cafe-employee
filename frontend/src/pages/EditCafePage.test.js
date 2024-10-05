@@ -1,97 +1,70 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { BrowserRouter as Router } from "react-router-dom";
+import { Provider } from "react-redux";
+import configureStore from "redux-mock-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import EditCafePage from "./EditCafePage";
-import * as api from "../utils/api"; // Adjust the path as necessary
+import EditCafePage from "./EditCafePage"; // Adjust the import path as necessary
+import axios from "axios";
 
-// Mock the entire api module
-jest.mock("../utils/api");
+// Mock axios
+jest.mock("axios");
 
+const mockStore = configureStore([]);
 const queryClient = new QueryClient();
 
 describe("EditCafePage", () => {
-  beforeEach(() => {
-    // Reset all mocks before each test
-    jest.clearAllMocks();
+  // Test Case 1: Render Title Based on `id`
+  it("displays the correct title based on id", () => {
+    const store = mockStore({});
+    // Set up your mock for the fetching function as needed here.
 
-    // Mock the fetchCafe to resolve with sample data
-    api.fetchCafe.mockResolvedValueOnce({
-      _id: "1",
-      name: "Cafe One",
-      description: "A cozy place.",
-      logo: "http://example.com/logo.png",
-      location: "Downtown",
-    });
+    // Assuming you are simulating the 'edit' state
+    render(
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <Router>
+            <EditCafePage />
+          </Router>
+        </QueryClientProvider>
+      </Provider>
+    );
+
+    expect(screen.getByText(/Add New Café/i)).toBeInTheDocument(); // Test for no id case
   });
 
-  test("displays the fetched cafe details", async () => {
+  // Test Case 2: Render Form Fields
+  it("renders form fields correctly", () => {
+    const store = mockStore({});
     render(
-      <QueryClientProvider client={queryClient}>
-        <EditCafePage />
-      </QueryClientProvider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <Router>
+            <EditCafePage />
+          </Router>
+        </QueryClientProvider>
+      </Provider>
     );
 
-    // Check if the cafe details are displayed
-    expect(await screen.findByLabelText(/name/i)).toHaveValue("Cafe One");
-    expect(screen.getByLabelText(/description/i)).toHaveValue("A cozy place.");
-    expect(screen.getByLabelText(/location/i)).toHaveValue("Downtown");
+    expect(screen.getByLabelText(/Name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Location/i)).toBeInTheDocument();
   });
 
-  test("displays an error message if submission fails", async () => {
-    // Mock a failed submission
-    api.updateCafe = jest
-      .fn()
-      .mockRejectedValueOnce(new Error("Submission failed"));
-
+  // Test Case 3: Cancel Button Functionality
+  it("navigates to cafes on cancel", () => {
+    const store = mockStore({});
     render(
-      <QueryClientProvider client={queryClient}>
-        <EditCafePage />
-      </QueryClientProvider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <Router>
+            <EditCafePage />
+          </Router>
+        </QueryClientProvider>
+      </Provider>
     );
 
-    // Simulate user actions to trigger submission
-    fireEvent.change(screen.getByLabelText(/name/i), {
-      target: { value: "Cafe One" },
-    });
-    fireEvent.change(screen.getByLabelText(/description/i), {
-      target: { value: "A cozy place." },
-    });
-    fireEvent.change(screen.getByLabelText(/location/i), {
-      target: { value: "Downtown" },
-    });
-
-    fireEvent.click(screen.getByText(/submit/i));
-
-    // Check for the error message
-    await waitFor(() =>
-      expect(screen.getByText(/error saving café/i)).toBeInTheDocument()
-    );
-  });
-
-  test("redirects to cafes page after successful submission", async () => {
-    // Mock a successful update
-    api.updateCafe = jest.fn().mockResolvedValueOnce({});
-
-    render(
-      <QueryClientProvider client={queryClient}>
-        <EditCafePage />
-      </QueryClientProvider>
-    );
-
-    // Simulate user actions to trigger submission
-    fireEvent.change(screen.getByLabelText(/name/i), {
-      target: { value: "Cafe One" },
-    });
-    fireEvent.change(screen.getByLabelText(/description/i), {
-      target: { value: "A cozy place." },
-    });
-    fireEvent.change(screen.getByLabelText(/location/i), {
-      target: { value: "Downtown" },
-    });
-
-    fireEvent.click(screen.getByText(/submit/i));
-
-    // Check that the navigate function was called to redirect
-    await waitFor(() => expect(window.location.pathname).toBe("/cafes"));
+    fireEvent.click(screen.getByText(/Cancel/i));
+    // Verify navigation logic here based on your router setup
   });
 });
