@@ -14,6 +14,11 @@ const employeeRoutes = require("./routes/employee");
 app.use("/cafe", cafeRoutes);
 app.use("/employee", employeeRoutes);
 
+// Add a route for the homepage
+app.get("/", (req, res) => {
+  res.send("<h1>Welcome to the Cafe and Employee API!</h1>");
+});
+
 // Determine which MongoDB URI to use based on the environment
 const mongoUri =
   process.env.NODE_ENV === "test" ? config.testMongodbUri : config.mongodbUri;
