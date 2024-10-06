@@ -51,7 +51,7 @@ const CafeTable = ({ cafes, onDelete }) => {
           <Button
             variant="outlined"
             color="error"
-            onClick={() => handleDelete(params.data._id)}
+            onClick={() => handleDelete(params.data.id)}
           >
             Delete
           </Button>

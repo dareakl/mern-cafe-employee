@@ -61,10 +61,21 @@ class CafeService {
     return cafe;
   }
   // Delete a cafe by its ID and remove associated employees
+  // static async deleteCafe(id) {
+  //   const cafe = await Cafe.findByIdAndDelete(id);
+  //   if (!cafe) throw new Error("Cafe not found");
+  //   await Employee.deleteMany({ cafeId: cafe._id });
+  // }
+
+  // Delete a cafe by its ID and remove associated employees
   static async deleteCafe(id) {
-    const cafe = await Cafe.findByIdAndDelete(id);
+    const cafe = await Cafe.findOneAndDelete({ id });
     if (!cafe) throw new Error("Cafe not found");
-    await Employee.deleteMany({ cafeId: cafe._id });
+
+    const deleteResult = await Employee.deleteMany({ cafeId: cafe.id });
+    if (deleteResult.deletedCount === 0) {
+      console.warn(`No employees found for cafe ID: ${cafe.id}`);
+    }
   }
 }
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -65,5 +65,42 @@ describe("EditCafePage", () => {
     );
 
     fireEvent.click(screen.getByText(/Cancel/i));
+  });
+
+  // Test Case: Show Error Message on Failed Submission
+  it("shows an error message on failed submission", async () => {
+    const store = mockStore({});
+    axios.post.mockRejectedValueOnce(new Error("Submission failed"));
+
+    render(
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <Router>
+            <EditCafePage />
+          </Router>
+        </QueryClientProvider>
+      </Provider>
+    );
+
+    fireEvent.change(screen.getByLabelText(/Name/i), {
+      target: { value: "Test Cafe" },
+    });
+    fireEvent.change(screen.getByLabelText(/Description/i), {
+      target: { value: "A nice place to relax." },
+    });
+    fireEvent.change(screen.getByLabelText(/Logo URL/i), {
+      target: { value: "http://example.com/logo.png" },
+    });
+    fireEvent.change(screen.getByLabelText(/Location/i), {
+      target: { value: "123 Coffee St" },
+    });
+
+    fireEvent.click(screen.getByText(/Submit/i));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Error saving café: Submission failed/i)
+      ).toBeInTheDocument();
+    });
   });
 });
