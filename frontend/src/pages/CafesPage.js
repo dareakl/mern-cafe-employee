@@ -13,25 +13,25 @@ import { fetchCafes, deleteCafe } from "../utils/api";
 
 const CafesPage = () => {
   const [locationFilter] = useState("");
-  const [successMessage, setSuccessMessage] = useState(""); // State for success message
+  const [successMessage, setSuccessMessage] = useState("");
 
   const { data: cafes = [], refetch, isLoading, isError, error } = useQuery({
     queryKey: ["cafes", locationFilter],
     queryFn: () => fetchCafes(locationFilter),
+    retry: false, // Disable automatic retries to handle errors manually
   });
-  // Mutation for deleting a café
+
   const mutation = useMutation({
     mutationFn: (id) => deleteCafe(id),
     onSuccess: () => {
       refetch();
-      setSuccessMessage("Café deleted successfully!"); // Set success message
-      // Hide success message after 3 seconds
+      setSuccessMessage("Café deleted successfully!");
       setTimeout(() => {
         setSuccessMessage("");
       }, 3000);
     },
   });
-  // Handle deletion of a café
+
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this café?")) {
       mutation.mutate(id);
@@ -39,11 +39,25 @@ const CafesPage = () => {
   };
 
   if (isLoading) return <CircularProgress />;
-  // Error handling
-  if (isError)
+
+  // Enhanced error handling
+  if (isError) {
     return (
-      <Alert severity="error">Error fetching cafés: {error.message}</Alert>
+      <Container>
+        <Alert severity="error">
+          Error fetching cafés: {error.message}.Please check if the backend
+          server is running.
+          <Button
+            onClick={refetch}
+            color="primary"
+            style={{ marginLeft: "10px" }}
+          >
+            Retry
+          </Button>
+        </Alert>
+      </Container>
     );
+  }
 
   return (
     <Container>
@@ -51,8 +65,6 @@ const CafesPage = () => {
         Cafés
       </Typography>
       <Box display="flex" justifyContent="space-between" mb={2}>
-        {" "}
-        {/* Flexbox for alignment */}
         <Box>
           <Button
             variant="contained"
@@ -73,16 +85,10 @@ const CafesPage = () => {
         </Box>
       </Box>
       <Box mt={2}>
-        {" "}
-        {/* Add margin top for the table */}
         <CafeTable cafes={cafes} onDelete={handleDelete} />
       </Box>
 
-      {successMessage && (
-        <Alert severity="success">
-          {successMessage} {/* Conditionally render success message */}
-        </Alert>
-      )}
+      {successMessage && <Alert severity="success">{successMessage}</Alert>}
     </Container>
   );
 };

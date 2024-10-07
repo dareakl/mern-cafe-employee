@@ -20,6 +20,7 @@ const EmployeesPage = () => {
   const { data: employees, refetch, isLoading, isError, error } = useQuery({
     queryKey: ["employees"],
     queryFn: fetchEmployees,
+    retry: false, // Disable automatic retries
   });
 
   const mutation = useMutation({
@@ -56,11 +57,20 @@ const EmployeesPage = () => {
     );
   }
 
+  // Enhanced error handling with retry option
   if (isError) {
     return (
       <Container>
         <Alert severity="error">
-          Error fetching employees: {error.message}. Please try again later.
+          Error fetching employees: {error.message}. Please check if the backend
+          server is running.
+          <Button
+            onClick={refetch}
+            color="primary"
+            style={{ marginLeft: "10px" }}
+          >
+            Retry
+          </Button>
         </Alert>
       </Container>
     );
@@ -72,8 +82,6 @@ const EmployeesPage = () => {
         Employees
       </Typography>
       <Box display="flex" justifyContent="space-between" mb={2}>
-        {" "}
-        {/* Flexbox for alignment */}
         <Box>
           <Button
             variant="contained"
@@ -94,8 +102,6 @@ const EmployeesPage = () => {
         </Box>
       </Box>
       <Box mt={2}>
-        {" "}
-        {/* Add margin top for the table */}
         <EmployeeTable employees={employees} onDelete={handleDelete} />
       </Box>
       {mutation.isLoading && <CircularProgress />}{" "}
