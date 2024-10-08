@@ -1,12 +1,49 @@
 # mern-cafe-employee
 
-1.To start Server
+1.To start Server (Dockerized)
 
-go to backend folder
+Navigate to the Root Directory
+Open your terminal and change to the root folder of the project.
 
-        npm i or npm install
-        After installation done
-        npm start
+Create the Docker Containers
+Use the docker-compose.yml file to create the Docker containers by executing the following command:
+docker-compose up -d --build
+Please allow a few moments for Docker to complete the setup. You should see output indicating the creation of the containers.
+
+        [+] Building 6.0s (10/10) FINISHED
+
+=> [internal] load .dockerignore 0.0s
+=> => transferring context: 2B 0.0s
+=> [internal] load build definition from Dockerfile 0.0s
+=> => transferring dockerfile: 432B 0.0s
+=> [internal] load metadata for docker.io/library/node:16 5.3s
+=> [internal] load build context 0.6s
+=> => transferring context: 605.63kB 0.6s
+=> [1/5] FROM docker.io/library/node:16@sha256:f77a1aef2da8d83e45ec990f45df50f1a286c5fe8bbfb8c6e4246c6389705c0b 0.0s
+=> CACHED [2/5] WORKDIR /usr/src/app 0.0s
+=> CACHED [3/5] COPY package\*.json ./ 0.0s
+=> CACHED [4/5] RUN npm install 0.0s
+=> CACHED [5/5] COPY . . 0.0s
+=> exporting to image 0.0s
+=> => exporting layers 0.0s
+=> => writing image sha256:b4ca2bc583144126a3bea86a1a220d6ee4d008d58110a6e97ea336066d90430a 0.0s
+=> => naming to docker.io/library/mern-cafe-employee-backend 0.0s
+[+] Running 3/3
+✔ Network mern-cafe-employee_default Created 0.1s
+✔ Container mongo_db Started 0.6s
+✔ Container mern-cafe-employee-backend-1 Started
+
+Verify Container Status
+To check if the Docker containers are running, use the following command:
+docker ps
+
+CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+63a1ca6fd602 mern-cafe-employee-backend "docker-entrypoint.s…" 19 seconds ago Up 18 seconds 0.0.0.0:4001->4001/tcp mern-cafe-employee-backend-1
+40d927552498 mongo:latest "docker-entrypoint.s…" 19 seconds ago Up 19 seconds 0.0.0.0:27017->27017/tcp mongo_db
+
+Access the Application
+Once the services are running, you can access the application at:
+http://localhost:4001
 
 Summary
 With this refactor, you now have a more organized code structure:

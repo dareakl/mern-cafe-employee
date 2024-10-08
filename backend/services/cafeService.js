@@ -60,12 +60,6 @@ class CafeService {
     if (!cafe) throw new Error("Cafe Not Found");
     return cafe;
   }
-  // Delete a cafe by its ID and remove associated employees
-  // static async deleteCafe(id) {
-  //   const cafe = await Cafe.findByIdAndDelete(id);
-  //   if (!cafe) throw new Error("Cafe not found");
-  //   await Employee.deleteMany({ cafeId: cafe._id });
-  // }
 
   // Delete a cafe by its ID and remove associated employees
   static async deleteCafe(id) {
